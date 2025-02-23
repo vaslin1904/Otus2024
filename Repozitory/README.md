@@ -28,5 +28,9 @@ Guest:
             **- dpkg-scanpackages /usr/local/repo /dev/null | gzip -9c > /usr/local/repo/Packages.gz**
 10. Информация о новом репозитории добавляется в /etc/apt/source.list
 ## ИТОГИ
-[Через nginx видны файлы репозитория](scrin/work_nginx.png)
+Через nginx видны файлы репозитория
+![Через nginx видны файлы репозитория](scrin/work_nginx.png)
+
+Apt видит репозиторий
+![Apt видит репозиторий](scrin/work_repo.png)
 
