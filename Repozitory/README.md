@@ -9,4 +9,7 @@ Host:
 Guest:
 - Ubuntu 22.04
 ## Необходиые дополнительные пакеты и библиотеки для сборки пакета их исходников
-Весь список находится в yml файле "
+Весь список находится в yml файле  [Repozitory/ansible/roles/repo/vars/main.yml](Repozitory/ansible/roles/repo/vars/main.yml)
+"Repozitory/ansible/roles/repo/vars/main.yml"
+Закомментируемы пакеты уже входят в состав дистрибутива Ubuntu 22.04, для другой системы они могут понадобиться.
+
