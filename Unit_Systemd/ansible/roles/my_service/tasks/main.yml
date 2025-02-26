@@ -1,6 +1,5 @@
 ---
-#Создаем свой сервис, который раз в 30 сек мониторит /var/log/watchlog.watchlog
-#на предмет наличия слова "ALERT"
+#Создаем свой сервис мониторинга log файла
   - name: watchlog
     ansible.builtin.include_tasks: "watchlog.yml"
     tags: watchlog

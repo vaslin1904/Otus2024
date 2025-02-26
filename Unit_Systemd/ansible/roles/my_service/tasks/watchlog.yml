@@ -1,10 +1,11 @@
 ---
+#Создаем свой сервис, который раз в 30 сек мониторит /var/log/watchlog.watchlog
+#на предмет наличия слова "ALERT"
 #Разместим файл с конфигурацией сервиса в директорию /etc/default
   - name: copy_config | Copy config of my service
     ansible.builtin.copy:
       dest: /etc/default
       src: etc/default/watchlog
-
 
 #Разместим файл log  в директорию /var/log
   - name: copy_config | Copy config of my service
@@ -20,8 +21,6 @@
       owner: root
       group: root
       mode: '0777'
-
-
 
 #Разместим юнит сервиса  в директорию /etc/systemd/system
   - name: copy_config | Copy config of my service
