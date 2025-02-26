@@ -1,0 +1,50 @@
+---
+  - name: Update_cache and install nessary packages
+    ansible.builtin.apt:
+      pkg: "{{ install_pkgs }}"
+      update_cache: yes
+
+  - name: Create_dir /etc/spawn-fcgi
+    ansible.builtin.file:
+      path: "/etc/spawn-fcgi"
+      state: directory
+    become: true
+
+# You must set some working options before the "spawn-fcgi"
+# service will working If SOCKET points to
+# a file, then this file is cleaned up by
+# the init script.
+  - name: copy_config | Copy config of spawn
+    ansible.builtin.copy:
+      dest: /etc/spawn-fcgi
+      src: etc/spawn-fcgi/fcgi.conf
+    become: true
+
+  - name: copy spawn service
+    ansible.builtin.copy:
+      dest: /etc/systemd/system
+      src: etc/systemd/system/spawn-fcgi.service
+      owner: root
+      group: root
+      mode: '0644'
+    become: true
+
+  - name: systemd daemon_reload
+    ansible.builtin.systemd_service:
+      daemon_reload: yes
+
+# Запускаем сервис, после первого запуска таймер будет отсчитывать 30 сек
+
+  - name: start_service
+    ansible.builtin.systemd_service:
+      name: spawn-fcgi.service
+      state: started
+  #Убедимся в работе сервиса
+  - name: Check_work
+    ansible.builtin.shell: systemctl status spawn-fcgi.service
+    register: status_spawn
+    become: true
+
+  - name: status_spawn
+    ansible.builtin.debug:
+      var: status_spawn.stdout_lines

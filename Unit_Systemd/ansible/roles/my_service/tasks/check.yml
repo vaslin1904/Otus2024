@@ -1,0 +1,37 @@
+---
+  #Убедимся в работе сервиса
+  - name: Check_work_1
+    ansible.builtin.shell: "systemctl status nginx@first"
+    register: status_ng_1
+    become: true
+
+  - name: status_nginx_services
+    ansible.builtin.debug:
+      var: status_ng_1.stdout_lines
+
+  - name: Check_work_2
+    ansible.builtin.shell: "systemctl status nginx@second"
+    register: status_ng_2
+    become: true
+
+  - name: status_nginx_services
+    ansible.builtin.debug:
+      var: status_ng_2.stdout_lines
+
+  - name: Check_tnulp
+    ansible.builtin.shell: "ss -tnulp | grep nginx"
+    register: c_tnulp
+    become: true
+
+  - name: status_tnulp
+    ansible.builtin.debug:
+      var: c_tnulp.stdout_lines
+
+  - name: Check_ps
+    ansible.builtin.shell: "ps -afx | grep nginx"
+    register: c_px
+    become: true
+
+  - name: status_px
+    ansible.builtin.debug:
+      var: c_px.stdout_lines  

@@ -1,0 +1,22 @@
+---
+# Копирование настроек nginx
+  - name: copy_config
+    ansible.builtin.copy:
+      dest: /etc/systemd/system
+      src: etc/systemd/system/nginx@.service
+    become: true
+
+# Копирование настроек nginx
+  - name: copy_config
+    ansible.builtin.copy:
+      dest: /etc/nginx
+      src: etc/nginx/{{ item }}
+    become: true
+    loop: "{{ nginx_config }}"
+
+# Запускаем сервисы nginx
+  - name: start_service
+    ansible.builtin.systemd_service:
+      name: "{{ item }}"
+      state: started
+    loop: "{{ nginx_s }}"

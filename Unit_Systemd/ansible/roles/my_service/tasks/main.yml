@@ -1,0 +1,28 @@
+---
+#Создаем свой сервис, который раз в 30 сек мониторит /var/log/watchlog.watchlog
+#на предмет наличия слова "ALERT"
+  - name: watchlog
+    ansible.builtin.include_tasks: "watchlog.yml"
+    tags: watchlog
+#
+#Устанавливаем spawn_fcgi
+#Spawn-fcgi — это собственный диспетчер процессов FastCGI
+#Обычно spawn-fcgi применяется в тех случаях,
+# когда приложение FastCGI работает на отдельном от
+# веб-сервера компьютере или нужно запустить приложение
+# от имени другого пользователя, например, для изоляции
+# друг от друга приложений разных пользователей,
+# работающих на одном сервере.
+  - name: spawn_fcgi
+    ansible.builtin.include_tasks: "spawn_fcgi.yml"
+    tags: spawn
+# # #
+#Настраиваем пакет nginx
+  - name: setting_nginx
+    ansible.builtin.include_tasks: "setting_nginx.yml"
+    tags: setting_nginx
+
+  #Настраиваем пакет nginx
+  - name: check_nginx
+    ansible.builtin.include_tasks: "check.yml"
+    tags: check

@@ -1,0 +1,79 @@
+---
+#Разместим файл с конфигурацией сервиса в директорию /etc/default
+  - name: copy_config | Copy config of my service
+    ansible.builtin.copy:
+      dest: /etc/default
+      src: etc/default/watchlog
+
+
+#Разместим файл log  в директорию /var/log
+  - name: copy_config | Copy config of my service
+    ansible.builtin.copy:
+      dest: /var/log
+      src: var/log/watchlog.log
+
+#Разместим скрипт  в директорию /opt
+  - name: copy_config | Copy config of my service
+    ansible.builtin.copy:
+      dest: /opt
+      src: opt/watchlog.sh
+      owner: root
+      group: root
+      mode: '0777'
+
+
+
+#Разместим юнит сервиса  в директорию /etc/systemd/system
+  - name: copy_config | Copy config of my service
+    ansible.builtin.copy:
+      dest: /etc/systemd/system/
+      src: etc/systemd/system/watchlog.service
+      owner: root
+      group: root
+      mode: '0644'
+    become: true
+
+#Разместим юнит таймера  в директорию /etc/systemd/system
+  - name: copy_config | Copy config of my service
+    ansible.builtin.copy:
+      dest: /etc/systemd/system
+      src: etc/systemd/system/watchlog.timer
+      owner: root
+      group: root
+      mode: '0644'
+    become: true
+
+  - name: systemd daemon_reload
+    ansible.builtin.systemd_service:
+      daemon_reload: yes
+# Запускаем сервис, после первого запуска таймер будет отсчитывать 30 сек
+  - name: start_service
+    ansible.builtin.systemd_service:
+      name: watchlog.service
+      state: started
+# Запускаем таймер
+  - name: start_timer
+    ansible.builtin.systemd_service:
+      name: watchlog.timer
+      state: started
+
+# Пауза в работе ansible 1 минута перед выводом команды tail
+  - name: Pause in work 30 seconds
+    ansible.builtin.pause:
+      seconds: 30
+
+#Убедимся в работе сервиса
+
+  - name: Check_work
+    ansible.builtin.shell: tail -n 10 /var/log/syslog | grep word
+    register: print_grep
+    become: true
+
+  - name: print_grep
+    ansible.builtin.debug:
+      var: print_grep.stdout_lines
+
+  - name: start_timer
+    ansible.builtin.systemd_service:
+      name: watchlog.timer
+      state: stopped

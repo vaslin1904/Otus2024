@@ -1,0 +1,16 @@
+---
+install_pkgs:
+  - spawn-fcgi
+  - php
+  - php-cgi
+  - php-cli
+  - apache2
+  - libapache2-mod-fcgid
+  - nginx
+
+nginx_config:
+  - nginx-first.conf
+  - nginx-second.conf
+nginx_s:
+  - nginx@first
+  - nginx@second
