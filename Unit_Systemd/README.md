@@ -33,37 +33,26 @@ _____________________________________________________________________
     **sudo systemctl start spawn-fcgi.service**
     **sudo systemctl status spawn-fcgi.service**
 ______________________________________________
-## **Одновременный запуск сервиса httpd с разными конфигами**
+## **Доработать unit-файл Nginx (nginx.service) для запуска нескольких инстансов сервера с разными конфигурационными файлами одновременно**
 ______________________________________________
-1. Найдем местоположение файла httpd.service.<br>
-![Статус httpd.service](картинки/10.png)<br>
-
-2. Скопируем httpd.service как шаблон в каталог /etc/systemd/system:<br>
-**cp /usr/lib/systemd/system/httpd.service /etc/systemd/system/httpd@.service**<br>
-![Создание шаблона сервиса httpd](картинки/12.png)
-
-3.  Добавим имя экземпляра  в шаблоне %I:<br>
- **vi /etc/systemd/system/httpd\@.service**<br>
- ![Изменение шаблона](картинки/13.png)
-
-4.  Создаем два файла окружения в директории, копируя файл /etc/sysconfig/httpd:httpd-first и httpd-second:<br>
-![Добавление 2-х файлов окружения](картинки/14.png)
-
-5. В файлазх окружения задаетсā опция для запуска веб-сервера с необходимым конфигурационным файлом.<br> 
-![Добавление опции](картинки/15.png)<br>
-
-6. Переходим в директорию с конфигами httpd: /etc/httpd/cong/.<br>
-Копируем оригинальный конфиг httpd.conf под именами  first.conf и second.conf. <br>
-Внесем изменения только в second.conf. <br>
-Добавим строчку PidFile /var/run/httpd-second.pid и Изменим порт для прослушивания на 8080 : Listen 8080. <br>
-![Добавление опции](картинки/16.png)<br>
-7. Запустим сервис httpd с разными конфигурационными файлами:<br>
-![first.config](картинки/17.png)<br>
-![second.config](картинки/18.png)<br>
+1. Cоздадим новый Unit-service systemd [nginx@.service](ansible/roles/my_service/files/etc/systemd/system/nginx@.service) для работы с шаблонами
+в директории /etc/systemd/system
+Имя экземпляра  в шаблоне имеет вид - **%I** (ExecStart=/usr/sbin/nginx -c /etc/nginx/nginx-**%I**.conf -g)
+2. После размещения новых Unit в директорию /etc/systemd/system Необходимо перезапустить systemd <br>
+                  **sudo systemctl daemon-reload**
+4.  Создаем два файла конфигурации из стандартного конфига /etc/nginx/nginx.conf с модификацией путей до PID-файлов и разделением по портам:
+   - [/etc/nginx/nginx-first.conf](ansible/roles/my_service/files/etc/nginx/nginx-first.conf)
+   - [/etc/nginx/nginx-second.conf](ansible/roles/my_service/files/etc/nginx/nginx-second.conf)
+5. Проверяем работу:
+* Запускаем сервисы: **sudo systemctl start nginx@first**
+                     **sudo systemctl start nginx@second**
+*Проверяем их статус: **sudo systemctl status nginx@first**
+                      **sudo systemctl status nginx@second**
+*Или Посмотрим какие порты слушаются: **ss -tnulp | grep nginx**
+*Или Посмотрим список процессов: **ps afx | grep nginx**
 ____________________________________________
 ## **Вывод**
 В данной работе рассмотрели создание юнитов systemd, их запуска. Рассмотрели способ одновременного запуска сервиса с разными конфигурационными файлами.
 _____________________________________________
-Файл Vagrant подзагружает box из облака, в котором уже есть сервис мониторинга. его только нужно запустить.
-Настроен httpd сервис для запуска с разными конфигурациями.
+Выполнение работы автоматизировано с помощью playbook ansible
 
