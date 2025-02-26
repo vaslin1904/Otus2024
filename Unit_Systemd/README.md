@@ -2,16 +2,22 @@
 ___________________________________________
 ## **Создание сервиса мониторинга**
 ___________________________________________
-1. Размещаем конфиг watchlog в директорию /etc/default со значением переменных:
+1. Размещаем конфиг **watchlog** в директорию /etc/default со значением переменных:
    - $WORD - устанавливается слова для поиска. В данной работе "Alert"
    - $LOG - полное имя лога, в котором будет произодиться поиск (/var/log/watchlog.log).
-2. Размещаем watchlog.log в директорию /var/log.
-3. Размещаем скрипт [watchlog.sh](ansible/roles/my_service/files/opt/watchlog.sh) в директорию /opt, который при нахождении эталонного слова в заданном логе
-с помощью команды logger помещает сообщение в системный лог.
-4. Создаем
-2. Проверим работу системы мониторинга:<br>
-**tail -f /var/log/messages**<br>
-![Мониторинг файла](картинки/6.png)<br>
+2. Размещаем **watchlog.log** в директорию /var/log.
+3. Размещаем скрипт [watchlog.sh](ansible/roles/my_service/files/opt/watchlog.sh) в директорию /opt, который при нахождении эталонного слова в заданном логе с помощью команды **logger** помещает сообщение в системный лог.
+4. Создаем Unit-service systemd [watchlog.service](ansible/roles/my_service/files/etc/systemd/system/watchlog.service),
+который передает параметры из [/etc/default/watchlog](ansible/roles/my_service/files/etc/default/watchlog)
+в скрипт [watchlog.sh](ansible/roles/my_service/files/opt/watchlog.sh) и запускает его.
+5. Создаем Unit-timer systemd [watchlog.timer](ansible/roles/my_service/files/etc/systemd/system/watchlog.timer),
+который каждый 30 секунд после первого запуска будет запускать watchlog.service.
+При совпадении имен таймер сам будет искать необходимый сервис, если он был запущен хотя бы один раз.
+6. После размещения новых Unit в директорию /etc/systemd/system Необходимо перезапустить systemd
+                  **sudo systemctl daemon-reload**
+7. Разово запустим сервис watchlog, а затем запускаем одноименный таймер.
+8. Проверим работу системы мониторинга:<br>
+              **tail -n /var/log/syslog | grep word**<br>
 _____________________________________________________________________
 ## **Переписать init-скрипт на unit-файл**
 _____________________________________________________________________
