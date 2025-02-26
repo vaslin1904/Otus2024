@@ -13,22 +13,25 @@ ___________________________________________
 5. Создаем Unit-timer systemd [watchlog.timer](ansible/roles/my_service/files/etc/systemd/system/watchlog.timer),
 который каждый 30 секунд после первого запуска будет запускать watchlog.service.
 При совпадении имен таймер сам будет искать необходимый сервис, если он был запущен хотя бы один раз.
-6. После размещения новых Unit в директорию /etc/systemd/system Необходимо перезапустить systemd
+6. После размещения новых Unit в директорию /etc/systemd/system Необходимо перезапустить systemd <br>
                   **sudo systemctl daemon-reload**
 7. Разово запустим сервис watchlog, а затем запускаем одноименный таймер.
 8. Проверим работу системы мониторинга:<br>
               **tail -n /var/log/syslog | grep word**<br>
 _____________________________________________________________________
-## **Переписать init-скрипт на unit-файл**
+## **Установить spawn-fcgi и создать unit-файл (spawn-fcgi.sevice) с помощью переделки init-скрипта**
 _____________________________________________________________________
-1. Устанавливаем spawn-fcgi и необходимые для него пакеты:<br>
-**yum install epel-release -y && yum install spawn-fcgi php php-cli mod_fcgid httpd -y**
-2. В файле /etc/sysconfig/spawn-fcgi раскомментируем строку "OPTIONS".<br>
-![Файл spawn-fcgi](картинки/7.png)<br>
-3. Создаем юнит: **vi /etc/systemd/system/spawn-fcgi.service**<br>.
-см. файл spawn-fcgi.service. <br>
-4. Запускаем созданный сервис. <br>
-![Запуск spawn-fcgi.service](картинки/8.png)<br>
+1. Устанавливаем spawn-fcgi и необходимые для него пакеты, заодно и nginx для следующего этапа<br>
+([список пакетов - install_pkgs](ansible/roles/my_service/vars/main.yml)
+2. Инит файл [[https://gist.github.com/cea2k/1318020](https://gist.github.com/cea2k/1318020 )
+3. Размещаем конфиг [fcgi.conf](ansible/roles/my_service/files/etc/spawn-fcgi/fcgi.conf) в директорию /etc/spawn-fcgi
+3. Создаем Unit-service systemd [spawn-fcgi.service](ansible/roles/my_service/files/etc/systemd/system/spawn-fcgi.service).
+ в директории /etc/systemd/system
+4. После размещения новых Unit в директорию /etc/systemd/system Необходимо перезапустить systemd <br>
+                  **sudo systemctl daemon-reload**
+5. Запускаем созданный сервис и проверяем его статус <br>
+    **sudo systemctl start spawn-fcgi.service**
+    **sudo systemctl status spawn-fcgi.service**
 ______________________________________________
 ## **Одновременный запуск сервиса httpd с разными конфигами**
 ______________________________________________
